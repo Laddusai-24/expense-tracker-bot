@@ -1,7 +1,10 @@
-import gspread
-from google.oauth2.service_account import Credentials
+import os
+import json
 import re
 from datetime import datetime, timedelta
+
+import gspread
+from google.oauth2.service_account import Credentials
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
@@ -12,7 +15,6 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 # -------------------------------
 # Telegram Bot Token
 # -------------------------------
-import os
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # -------------------------------
@@ -23,7 +25,15 @@ scope = [
     "https://www.googleapis.com/auth/drive"
 ]
 
-creds = Credentials.from_service_account_file("yourfile.json", scopes=scope)
+# Load credentials safely from environment
+creds_json = os.getenv("GOOGLE_CREDS")
+
+if not creds_json:
+    raise ValueError("GOOGLE_CREDS not found in environment variables")
+
+creds_dict = json.loads(creds_json)
+creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+
 client = gspread.authorize(creds)
 
 # -------------------------------
