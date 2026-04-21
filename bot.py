@@ -28,6 +28,13 @@ scope = [
 # Load credentials safely from environment
 creds_json = os.getenv("GOOGLE_CREDS")
 
+print("Checking GOOGLE_CREDS...")
+
+if creds_json:
+    print(creds_json[:50])
+else:
+    print("GOOGLE_CREDS is None ❌")
+
 if not creds_json:
     raise ValueError("GOOGLE_CREDS not found in environment variables")
 
