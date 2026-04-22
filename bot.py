@@ -213,9 +213,9 @@ def delete_last_entry(sheet):
     return True
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        ["today", "summary"],
-        ["breakdown", "report"],
-        ["undo"]
+        ["📊 Today", "📅 Summary"],
+        ["📈 Breakdown", "📄 Report"],
+        ["↩️ Undo"]
     ]
 
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
