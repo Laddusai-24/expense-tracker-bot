@@ -9,8 +9,8 @@ from google.oauth2.service_account import Credentials
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
-from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CommandHandler
 
 # -------------------------------
 # Telegram Bot Token
@@ -211,6 +211,27 @@ def delete_last_entry(sheet):
 
     sheet.delete_rows(row_count)
     return True
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        ["today", "summary"],
+        ["breakdown", "report"],
+        ["undo"]
+    ]
+
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+    message = """
+👋 Welcome to Expense Tracker Bot!
+
+💰 Track your daily expenses easily.
+
+🧠 Example:
+Spent 200 on food
+
+👇 Use buttons below or type your expense.
+"""
+
+    await update.message.reply_text(message, reply_markup=reply_markup)
 # -------------------------------
 # Handle Telegram Message
 # -------------------------------
@@ -299,7 +320,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # -------------------------------
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-
+    app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("Bot is running...")
