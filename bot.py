@@ -253,18 +253,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # -------------------------------
 
     # TODAY
-    if user_text == "today":
+    if "today" in user_text:
         total = get_today_summary(sheet)
         await update.message.reply_text(f"📊 Today’s spending: ₹{total}")
         return
 
     # MONTHLY
-    if user_text == "summary":
+    if "summary" in user_text:
         total = get_monthly_summary(sheet)
         await update.message.reply_text(f"💰 This month: ₹{total}")
         return
     # CATEGORY BREAKDOWN
-    if user_text == "breakdown":
+    if "breakdown" in user_text:
         data = get_category_breakdown(sheet)
 
         if not data:
@@ -278,7 +278,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(message)
         return
     # UNDO LAST ENTRY
-    if user_text == "undo":
+    if "undo" in user_text:
         success = delete_last_entry(sheet)
 
         if success:
@@ -288,7 +288,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         return
     # PDF REPORT
-    if user_text == "report":
+    if "report" in user_text:
         file_path = generate_monthly_pdf(sheet)
 
         with open(file_path, "rb") as f:
