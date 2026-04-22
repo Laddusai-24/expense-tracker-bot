@@ -16,6 +16,8 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 # Telegram Bot Token
 # -------------------------------
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN not found ❌")
 
 # -------------------------------
 # Google Sheets Setup
@@ -30,14 +32,9 @@ creds_json = os.getenv("GOOGLE_CREDS")
 
 print("Checking GOOGLE_CREDS...")
 
-if creds_json:
-    print(creds_json[:50])
-else:
-    print("GOOGLE_CREDS is None ❌")
-
 if not creds_json:
+    print("GOOGLE_CREDS is None ❌")
     raise ValueError("GOOGLE_CREDS not found in environment variables")
-
 creds_dict = json.loads(creds_json)
 creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
 
@@ -227,7 +224,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #print(user_name)
     
     # Open sheet
-    sheet_name = f"{user_name}_{user_id}"
+    sheet_name = f"user_{user_id}"
     sheet = get_user_sheet(sheet_name)
 
     # -------------------------------
@@ -273,9 +270,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_text == "report":
         file_path = generate_monthly_pdf(sheet)
 
-        await update.message.reply_document(
-            document=open(file_path, "rb")
-        )
+        with open(file_path, "rb") as f:
+            await update.message.reply_document(document=f)
+
+        os.remove(file_path)  # ✅ delete after sending
         return   
     # -------------------------------
     # Expense entry
@@ -308,13 +306,7 @@ async def main():
 
     print("Bot is running...")
 
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
-
-    # keep app alive forever
-    await asyncio.Event().wait()
-
+    await app.run_polling()   # ✅ this handles everything internally
 
 if __name__ == "__main__":
     asyncio.run(main())
